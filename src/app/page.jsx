@@ -13,7 +13,7 @@ import { Flare } from '@/components/Flare'
 import { lerp, lerpV3 } from '@/lib/utils'
 
 // import lutTex from '@/lib/lut/F-6800-STD.cube?url'
-import inter from '@/lib/fonts/Inter_Bold.json'
+import inter from '@/lib/fonts/inter.json'
 
 export default function App() {
   // const texture = useLoader(LUTCubeLoader, lutTex)
@@ -121,7 +121,7 @@ function Scene() {
       {/* Caption */}
       <Center top bottom position={[0, 2, 0]}>
         <Text3D size={0.7} letterSpacing={-0.05} height={0.05} font={inter}>
-          Dynamic without Limits
+          Dark side of the Moon
           <meshStandardMaterial color="white" />
         </Text3D>
       </Center>
