@@ -10,8 +10,7 @@ import { Beam } from '@/components/Beam'
 import { Rainbow } from '@/components/Rainbow'
 import { Prism } from '@/components/Prism'
 import { Flare } from '@/components/Flare'
-import { Box } from '@/components/Box'
-import { calculateRefractionAngle, lerp, lerpV3 } from '@/lib/utils'
+import { lerp, lerpV3 } from '@/lib/utils'
 
 // import lutTex from '@/lib/lut/F-6800-STD.cube?url'
 import inter from '@/lib/fonts/Inter_Bold.json'
@@ -67,15 +66,15 @@ function Scene() {
     // Set flare
     flare.current.position.set(position.x, position.y, -0.5)
     flare.current.rotation.set(0, 0, -Math.atan2(direction.x, direction.y))
-    // Calculate refraction angles
+    // Calculate reflection angle
     let angleScreenCenter = Math.atan2(-position.y, -position.x)
     const normalAngle = Math.atan2(normal.y, normal.x)
     // The angle between the ray and the normal
     const incidentAngle = angleScreenCenter - normalAngle
-    // Calculate the refraction for the incident angle
-    const refractionAngle = calculateRefractionAngle(incidentAngle) * 6
-    // Apply the refraction
-    angleScreenCenter += refractionAngle
+    // Calculate the reflection angle (equal to the incident angle)
+    const reflectionAngle = incidentAngle
+    // Apply the reflection
+    angleScreenCenter = normalAngle - reflectionAngle
     rainbow.current.rotation.z = angleScreenCenter
     // Set spot light
     lerpV3(
@@ -126,12 +125,9 @@ function Scene() {
           <meshStandardMaterial color="white" />
         </Text3D>
       </Center>
-      {/* Prism + blocks + reflect beam */}
+      {/* Prism + reflect beam */}
       <Beam ref={boxreflect} bounce={10} far={20}>
         <Prism position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
-        <Box position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} />
-        <Box position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} />
-        <Box position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} />
       </Beam>
       {/* Rainbow and flares */}
       <Rainbow ref={rainbow} startRadius={0} endRadius={0.5} fade={0} />
