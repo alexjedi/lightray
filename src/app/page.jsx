@@ -66,49 +66,33 @@ function Scene() {
     // Set flare
     flare.current.position.set(position.x, position.y, -0.5)
     flare.current.rotation.set(0, 0, -Math.atan2(direction.x, direction.y))
-    // Calculate reflection angle
-    let angleScreenCenter = Math.atan2(-position.y, -position.x)
-    const normalAngle = Math.atan2(normal.y, normal.x)
-    // The angle between the ray and the normal
-    const incidentAngle = angleScreenCenter - normalAngle
-    // Calculate the reflection angle (equal to the incident angle)
-    const reflectionAngle = incidentAngle
-    // Apply the reflection
-    angleScreenCenter = normalAngle - reflectionAngle
-    rainbow.current.rotation.z = angleScreenCenter
-    // Set spot light
-    lerpV3(
-      spot.current.target.position,
-      [Math.cos(angleScreenCenter), Math.sin(angleScreenCenter), 0],
-      0.05
-    )
+
+    // Always set the rainbow to reflect to the right
+    rainbow.current.rotation.z = 0 // 45 degrees to the right
+    rainbow.current.position.set(position.x + 0.5, position.y - 0.5, 0) // Offset to the right and slightly down
+
+    // Set spot light to follow the rainbow
+    spot.current.target.position.set(position.x + 1, position.y - 1, 0)
     spot.current.target.updateMatrixWorld()
   }, [])
 
   useFrame((state) => {
-    // Tie beam to the mouse
-    boxreflect.current.setRay(
-      [
-        (state.pointer.x * state.viewport.width) / 2,
-        (state.pointer.y * state.viewport.height) / 2,
-        0,
-      ],
-      [0, 0, 0]
-    )
+    // Set beam to come from the top of the canvas
+    boxreflect.current.setRay([0, state.viewport.height / 2, 0], [0, -1, 0])
     // Animate rainbow intensity
     lerp(rainbow.current.material, 'emissiveIntensity', isPrismHit ? 2.5 : 0, 0.1)
     spot.current.intensity = rainbow.current.material.emissiveIntensity
     // Animate ambience
-    lerp(ambient.current, 'intensity', 0, 0.025)
+    // lerp(ambient.current, 'intensity', 0, 0.025)
   })
 
   return (
     <>
       {/* Lights */}
-      <ambientLight ref={ambient} intensity={0} />
-      <pointLight position={[10, -10, 0]} intensity={0.05 * Math.PI} decay={0} />
-      <pointLight position={[0, 10, 0]} intensity={0.05 * Math.PI} decay={0} />
-      <pointLight position={[-10, 0, 0]} intensity={0.05 * Math.PI} decay={0} />
+      <ambientLight ref={ambient} intensity={2} />
+      <pointLight position={[10, -10, 0]} intensity={1.05 * Math.PI} decay={0} />
+      <pointLight position={[0, 10, 0]} intensity={1.05 * Math.PI} decay={0} />
+      <pointLight position={[-10, 0, 0]} intensity={1.05 * Math.PI} decay={0} />
       <spotLight
         ref={spot}
         intensity={Math.PI}
@@ -127,7 +111,7 @@ function Scene() {
       </Center>
       {/* Prism + reflect beam */}
       <Beam ref={boxreflect} bounce={10} far={20}>
-        <Prism position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
+        <Prism position={[0, -3, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
       </Beam>
       {/* Rainbow and flares */}
       <Rainbow ref={rainbow} startRadius={0} endRadius={0.5} fade={0} />
